@@ -1,0 +1,269 @@
+definitions:
+  models.Account:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      payments:
+        items:
+          $ref: '#/definitions/models.PaymentHistory'
+        type: array
+      type:
+        type: string
+      updated_at:
+        type: string
+      userID:
+        type: integer
+    type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  models.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.PaymentHistory:
+    properties:
+      accountID:
+        type: integer
+      amount:
+        type: number
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      status:
+        type: string
+      timestamp:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  models.ResponseMessage:
+    properties:
+      message:
+        type: string
+    type: object
+  models.TokenResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  models.Transaction:
+    properties:
+      account:
+        $ref: '#/definitions/models.Account'
+      accountID:
+        type: integer
+      amount:
+        type: number
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      status:
+        type: string
+      timestamp:
+        type: integer
+      toAddress:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.User:
+    properties:
+      accounts:
+        items:
+          $ref: '#/definitions/models.Account'
+        type: array
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      password:
+        type: string
+      updated_at:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /accounts:
+    get:
+      description: Ambil semua akun dari database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Account'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Ambil semua akun
+      tags:
+      - akun
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login pengguna dengan email dan password
+      parameters:
+      - description: Data Login
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Login pengguna
+      tags:
+      - pengguna
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Registrasi pengguna baru dengan email dan password
+      parameters:
+      - description: Data Pengguna
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ResponseMessage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Registrasi pengguna baru
+      tags:
+      - pengguna
+  /send:
+    post:
+      consumes:
+      - application/json
+      description: Tambahkan transaksi baru dan proses secara asinkron
+      parameters:
+      - description: Data Transaksi
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.Transaction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Kirim transaksi baru
+      tags:
+      - transaksi
+  /transactions:
+    get:
+      description: Ambil semua transaksi dari database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Transaction'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Ambil semua transaksi
+      tags:
+      - transaksi
+  /withdraw:
+    post:
+      consumes:
+      - application/json
+      description: Tambahkan transaksi penarikan baru dan proses secara asinkron
+      parameters:
+      - description: Data Transaksi
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.Transaction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Tarik dana dari akun
+      tags:
+      - transaksi
+swagger: "2.0"
